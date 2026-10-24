@@ -7,7 +7,7 @@ STATIONS = PROC_DIR / "stations.csv"
 RAIN = PROC_DIR / "rain.csv"
 DAILY = PROC_DIR / "daily.csv"
 MODEL_PATH = ROOT / "models/model.joblib"
-THRESHHOLDS = ROOT / "models/thresholds.json"
+THRESHOLDS = ROOT / "models/thresholds.json"
 
 START_YEAR, END_YEAR = 2023, 2025
 LAGS = [1, 2, 3, 7, 14, 30]
