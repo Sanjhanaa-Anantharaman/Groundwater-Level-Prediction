@@ -9,3 +9,4 @@ imdlib
 xarray
 pytest
 httpx
+matplotlib
