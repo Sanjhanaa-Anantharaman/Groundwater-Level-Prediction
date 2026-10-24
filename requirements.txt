@@ -4,5 +4,8 @@ pandas
 numpy
 scikit-learn
 joblib
+openpyxl
+imdlib
+xarray
 pytest
 httpx
