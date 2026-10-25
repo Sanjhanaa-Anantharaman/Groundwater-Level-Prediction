@@ -1,0 +1,5 @@
+station_id,name,district,lat,lon,aquifer,well_depth_m
+CGWBNG0586,Kauthe_1,Pune,18.8912,74.1795,Semi-confined,108.0
+CGWBNG0540,Khadakwasala_3,Pune,18.4456,73.7769,Semi-confined,172.4
+CGWNAG2198,Khutbhav_1,Pune,18.5108,74.33,Semi-confined,33.0
+CGWNAG2197,Parawadi,Pune,18.2814,74.6525,Semi-confined,200.0

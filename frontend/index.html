@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Jal Setu</title>
+  <meta name="description" content="Farmer-centric groundwater dashboard for Pune district monitoring wells.">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header>
+  <div class="hwrap">
+    <div class="brand">
+      <h1>Jal Setu</h1>
+      <div class="sub">Groundwater for your farm</div>
+    </div>
+    <nav class="top" id="topnav">
+      <a href="#overview" class="on">Overview</a>
+      <a href="#map">Map</a>
+      <a href="#forecast">Forecast</a>
+      <a href="#alerts">Alerts</a>
+      <a href="#advice">Advice</a>
+      <a href="#trends">Trends</a>
+      <a href="#about">Model &amp; data</a>
+    </nav>
+    <label class="loc" title="Choose your area"><span>📍</span><select id="stationSel" aria-label="Monitoring well"></select></label>
+  </div>
+</header>
+
+<div id="fatal" hidden></div>
+
+<div class="wrap" id="app">
+  <aside>
+    <div class="card">
+      <h3>Monitoring wells</h3>
+      <div class="wells" id="wells"><div class="skel"></div><div class="skel"></div><div class="skel"></div></div>
+    </div>
+  </aside>
+
+  <main>
+    <section id="overview">
+      <div class="titlerow">
+        <div>
+          <h2 class="title">Overview</h2>
+          <p class="lead">How is groundwater doing across the region, and in your area?</p>
+        </div>
+        <div class="horizon">
+          <span class="small muted">Look ahead</span>
+          <div class="seg sm" id="daysSeg"></div>
+        </div>
+      </div>
+      <div class="card" style="margin-bottom:18px">
+        <h3>Region status</h3>
+        <div class="region" id="region"><div class="skel"></div></div>
+      </div>
+      <div class="card" style="margin-bottom:18px" id="hero"><div class="skel tall"></div></div>
+      <div class="grid2">
+        <div class="card"><h3>What this means</h3><p class="plain" id="meaning"></p></div>
+        <div class="card"><h3>Recommended action</h3><p class="plain" id="reco"></p></div>
+      </div>
+    </section>
+
+    <section id="map">
+      <h2 class="title">Map</h2>
+      <p class="lead">Where is the problem? Click a well to select it.</p>
+      <div class="grid2">
+        <div class="card">
+          <div class="mapbox" id="mapbox"></div>
+          <div class="legend">
+            <span><span class="dot" style="background:var(--safe)"></span> Safe</span>
+            <span><span class="dot" style="background:var(--watch)"></span> Watch</span>
+            <span><span class="dot" style="background:var(--crit)"></span> Critical</span>
+            <span><span class="dot" style="background:var(--unk)"></span> Unknown</span>
+            <span>Schematic: wells positioned by latitude/longitude.</span>
+          </div>
+        </div>
+        <div class="card">
+          <h3>All wells</h3>
+          <div class="tscroll">
+            <table>
+              <thead><tr><th>Well</th><th>Status</th><th class="num">Depth today</th><th class="num">Change (<span id="thDays">30</span> d)</th></tr></thead>
+              <tbody id="wellTable"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="forecast">
+      <h2 class="title">Forecast</h2>
+      <p class="lead" id="fcLead"></p>
+      <div class="card" style="margin-bottom:18px" id="chart"><div class="skel tall"></div></div>
+      <div class="card"><h3>In simple words</h3><p class="plain" id="fcText"></p></div>
+    </section>
+
+    <section id="alerts">
+      <h2 class="title">Alerts</h2>
+      <p class="lead">Automatic warnings, so you don't have to check every day.</p>
+      <div class="grid2" id="alertList"><div class="skel"></div></div>
+    </section>
+
+    <section id="advice">
+      <h2 class="title">Advice</h2>
+      <p class="lead" id="advLead"></p>
+      <div class="grid2">
+        <div class="card" id="advice-card"></div>
+        <div class="card" id="whatif"></div>
+      </div>
+    </section>
+
+    <section id="trends">
+      <h2 class="title">Trends</h2>
+      <p class="lead" id="trLead">How much the monsoon refills the well each year, and unusual readings.</p>
+      <div class="grid2">
+        <div class="card" id="recharge"></div>
+        <div class="card" id="anomalies"></div>
+      </div>
+    </section>
+
+    <section id="about">
+      <h2 class="title">Model &amp; data</h2>
+      <p class="lead">What powers these numbers.</p>
+      <div class="grid2">
+        <div class="card" id="aboutData"></div>
+        <div class="card" id="aboutModels"></div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<footer>
+  <b>HCI prototype — ML Lab project.</b> The ML model predicts the groundwater level; this site turns it into a
+  condition, trend, forecast, risk and action. All content is loaded live from the Groundwater Forecast API.
+  Groundwater data: India-WRIS / CGWB. Rainfall: IMD. Decision support only, not an official hydrogeological assessment.
+</footer>
+
+<script src="config.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
