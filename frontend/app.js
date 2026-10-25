@@ -34,8 +34,20 @@ const risk = s => RISK[s?.risk] || RISK.UNKNOWN;
 const trend = s => TREND[s?.trend] || TREND.unknown;
 
 /* ---------- API ---------- */
+// Static mode (GitHub Pages): export_static.py saved each API response as a JSON file under data/.
+const SNAPSHOT = window.STATIC_SNAPSHOT || null;
+function snapshotFile(path, opts) {
+  const [p, q] = path.split("?");
+  if (p === "/whatif") {
+    const b = JSON.parse(opts.body);
+    return `data/whatif/${b.station_id}-${b.usage}-${b.days}.json`;
+  }
+  const days = new URLSearchParams(q || "").get("days");
+  return `data${p}${days ? "-" + days : ""}.json`;
+}
+
 async function api(path, opts) {
-  const r = await fetch(API + path, opts);
+  const r = SNAPSHOT ? await fetch(snapshotFile(path, opts)) : await fetch(API + path, opts);
   if (!r.ok) {
     let msg = `${r.status} ${r.statusText}`;
     try { const j = await r.json(); if (j.detail) msg += ` — ${typeof j.detail === "string" ? j.detail : JSON.stringify(j.detail)}`; } catch {}
@@ -422,6 +434,8 @@ async function init() {
   let saved; try { saved = localStorage.getItem("jalsetu.station"); } catch {}
   const idx = st.stations.findIndex(s => s.id === saved);
   st.cur = idx >= 0 ? idx : 0;
+
+  if (SNAPSHOT) byId("source").textContent = `Built from the Groundwater Forecast API on ${fmtDate(SNAPSHOT)}.`;
 
   const sel = byId("stationSel");
   sel.innerHTML = st.stations.map((s, i) => `<option value="${i}">${esc(s.name)}</option>`).join("");

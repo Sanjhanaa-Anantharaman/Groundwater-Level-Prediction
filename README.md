@@ -250,9 +250,13 @@ python frontend/serve.py          # dashboard on http://127.0.0.1:5500/
 
 The API base URL is set in `frontend/config.js`.
 
-### Deploying on Render
+### Publishing on GitHub Pages
 
-`render.yaml` defines one web service: it installs the requirements, retrains the model from `data/processed/` during the build, and runs the backend behind `frontend/serve.py`. On Render, create a new Blueprint from this repository.
+`.github/workflows/pages.yml` publishes the dashboard on every push to `main` (and once a day). It trains the model from `data/processed/`, runs `frontend/export_static.py` to save every API response the dashboard uses as JSON, and deploys the result to GitHub Pages. The backend code is unchanged; the published site is a static build of its responses.
+
+One-time setup (repository admin): **Settings → Pages → Build and deployment → Source: GitHub Actions**. The site is then at `https://<owner>.github.io/<repo>/`.
+
+To build it locally: `python -m src.train && python frontend/export_static.py` (writes `dist/`).
 
 ## Results
 
