@@ -1,8 +1,11 @@
+
 import datetime as dt
-from typing import Literal
+from typing import Literal, Optional
+
 from pydantic import BaseModel, Field
 
-Risk = Literal["SAFE", "WATCH", "CRITICAL"]
+
+Risk = Literal["SAFE", "WATCH", "CRITICAL", "UNKNOWN"]
 
 
 class Point(BaseModel):
@@ -16,20 +19,22 @@ class Station(BaseModel):
     district: str
     lat: float
     lon: float
-    level: float
+    level: Optional[float] = None
     risk: Risk
 
 
 class Status(BaseModel):
     station_id: str
-    as_of: dt.date
-    level: float
-    trend: Literal["declining", "stable", "improving"]
+    as_of: Optional[dt.date] = None
+    level: Optional[float] = None
+    trend: Literal["declining", "stable", "improving", "unknown"]
     risk: Risk
     days: int
-    forecast_level: float
-    change_m: float
+    data_age_days: Optional[int] = None
+    forecast_level: Optional[float] = None
+    change_m: Optional[float] = None
     advice: str
+    alerts: list[str] = Field(default_factory=list)
 
 
 class ForecastOut(BaseModel):
