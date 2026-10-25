@@ -13,3 +13,4 @@ models/*
 !data/imd/.gitkeep
 !data/processed/.gitkeep
 !models/.gitkeep
+dist/

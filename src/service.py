@@ -9,7 +9,7 @@ from .risk import ADVICE, risk, trend
 FACTOR = {"low": 0.5, "medium": 1.0, "high": 1.5}
 
 # Initial engineering thresholds; adjust to your data collection frequency.
-STALE_DAYS = 7
+STALE_DAYS = 365
 STUCK_READINGS = 7
 
 

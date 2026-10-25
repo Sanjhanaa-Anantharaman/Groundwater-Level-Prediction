@@ -237,6 +237,27 @@ export async function getStationStatus(stationId, days = 30) {
 
 This example assumes the frontend and backend are running on the same computer. For deployment, configure the API base URL for the deployed backend rather than using `127.0.0.1`.
 
+## Dashboard (frontend)
+
+`frontend/` contains the Jal Setu dashboard (plain HTML/CSS/JS, no build step). `frontend/serve.py` serves it and forwards `/api/*` requests to the backend, so no CORS setup is needed.
+
+Run the backend and the dashboard in two terminals:
+
+```bash
+uvicorn app.main:app --reload     # backend on port 8000
+python frontend/serve.py          # dashboard on http://127.0.0.1:5500/
+```
+
+The API base URL is set in `frontend/config.js`.
+
+### Publishing on GitHub Pages
+
+`.github/workflows/pages.yml` publishes the dashboard on every push to `main` (and once a day). It trains the model from `data/processed/`, runs `frontend/export_static.py` to save every API response the dashboard uses as JSON, and deploys the result to GitHub Pages. The backend code is unchanged; the published site is a static build of its responses.
+
+One-time setup (repository admin): **Settings → Pages → Build and deployment → Source: GitHub Actions**. The site is then at `https://<owner>.github.io/<repo>/`.
+
+To build it locally: `python -m src.train && python frontend/export_static.py` (writes `dist/`).
+
 ## Results
 
 The current training output compares Ridge and Gradient Boosting Regressor (GBR) with a persistence baseline at 7-, 14-, and 30-day horizons. Persistence predicts that the groundwater level remains at its latest observed value.
