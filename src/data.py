@@ -1,66 +1,26 @@
 import pandas as pd
-from .config import RAW_DIR, DAILY, RAIN, STATIONS, MAX_GAP, MIN_DAYS, MIN_COV
+from .config import RAW_DIR, DAILY, RAIN, MAX_GAP, MIN_DAYS, MIN_COV
 from .readers import read_station_file
 
 
 def load_levels():
     out = []
-    stations = pd.read_csv(STATIONS, dtype={"station_id": str})
-    name_to_id = {
-    str(row["name"]).strip().lower(): str(row["station_id"]).strip()
-    for _, row in stations.iterrows()
-    }
     for f in sorted(RAW_DIR.glob("*.xlsx")):
         meta, d = read_station_file(f)
-
         if d.empty:
             print("no readings sheet:", f.name)
             continue
-
-        d = d[
-            d["data type description"]
-            .astype(str)
-            .str.contains("water level", case=False)
-        ].copy()
-
-        d["date"] = pd.to_datetime(
-            d["data time"], errors="coerce"
-        ).dt.normalize()
-
-        d["level"] = pd.to_numeric(
-            d["data value"], errors="coerce"
-        )
-
-        matched_name = next(
-            (
-                name for name in name_to_id
-                if name in f.stem.lower()
-            ),
-            None,
-        )
-
-        if matched_name is None:
-            raise ValueError(f"Could not map Excel file to a station: {f.name}")
-
-        d["station_id"] = name_to_id[matched_name]
-
+        d = d[d["data type description"].astype(str).str.contains("water level", case=False)].copy()
+        d["date"] = pd.to_datetime(d["data time"], errors="coerce").dt.normalize()
+        d["level"] = pd.to_numeric(d["data value"], errors="coerce")
+        d["station_id"] = str(meta.get("station code", f.stem))
         out.append(d[["station_id", "date", "level"]])
-
-    if not out:
-        raise ValueError(
-            "No groundwater-level readings found in the Excel files."
-        )
-
-    df = pd.concat(out, ignore_index=True).dropna(
-        subset=["date", "level"]
-    )
-
+    df = pd.concat(out).dropna()
     flip = df.groupby("station_id")["level"].transform("median") < 0
     df.loc[flip, "level"] = -df.loc[flip, "level"]
+    return df[df["level"] > 0]
 
-    return df
 
-        
 def build_dataset():
     df = load_levels()
     rain = pd.read_csv(RAIN, parse_dates=["date"], dtype={"station_id": str})
@@ -70,6 +30,7 @@ def build_dataset():
         mad = (g["level"] - med).abs().median() or 1e-6
         g = g[(g["level"] - med).abs() < 8 * 1.4826 * mad]
         s = g.groupby("date")["level"].mean().asfreq("D")
+        s = s.where((s - s.rolling(7, center=True, min_periods=3).median()).abs() < 1.0)
         s = s.loc[s.first_valid_index(): s.last_valid_index()]
         cov = s.notna().mean()
         s = s.interpolate(limit=MAX_GAP)
@@ -80,12 +41,13 @@ def build_dataset():
             r = s.rename("level").reset_index()
             r["station_id"] = sid
             rows.append(r)
-    res = pd.concat(rows).merge(rain, on=["station_id","date"], how="left")
+    res = pd.concat(rows).merge(rain, on=["station_id", "date"], how="left")
     print("rows without rain (dropped):", int(res["rain"].isna().sum()))
     res = res.dropna(subset=["rain"])
     DAILY.parent.mkdir(parents=True, exist_ok=True)
     res.to_csv(DAILY, index=False)
     return res
+
 
 if __name__ == "__main__":
     build_dataset()
